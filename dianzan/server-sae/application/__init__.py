@@ -4,17 +4,17 @@ from flask import Flask
 app = Flask(__name__)
 app.DEBUG = True
 
-import ConfigParser
-import os
+#import ConfigParser
+#import os
 #import logging
 
-config = ConfigParser.RawConfigParser()
+#config = ConfigParser.RawConfigParser()
 
-with open('./env.cfg','w') as fi:
-    config.add_section('dir')
-    config.set('dir', 'root', os.path.abspath('.'))
-    config.write(fi)
-
+#with open('./env.cfg','w') as fi:
+#    config.add_section('dir')
+#    config.set('dir', 'root', os.path.abspath('.'))
+#    config.write(fi)
+#
 
 #logging.basicConfig(filename= 'logs/debug.log',level=logging.DEBUG)
 #logging.debug('tess')

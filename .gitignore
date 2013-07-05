@@ -5,3 +5,4 @@ cookie
 *.cookie
 cookie.*
 *.pyc
+*.cfg

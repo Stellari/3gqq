@@ -120,7 +120,7 @@ class Dianzan:
         self.verify = None
         self.url = url
 
-        #print self.session.get(url).content
+        print self.session.get(url).content
 
         #至此已经登陆成功了
     def _verify(self, data, headers, url = None):
@@ -164,6 +164,7 @@ class Dianzan:
         url = self._parse(feed_url, '/wml/card/@ontimer') #不知道为什么换了一个qq号的时候这里会多加一个跳转
         if url:
             feed_url = url[0].content
+
         for i in xrange(cnt):
             print "feed_url:" + feed_url
             content = self.session.get(feed_url).content
@@ -196,6 +197,9 @@ class Dianzan_verify(Dianzan):
 
 
 if __name__ == "__main__":
-    qq = raw_input('qq:')
-    pwd = raw_input('pwd:')
+    #qq = raw_input('qq:')
+    #pwd = raw_input('pwd:')
+    qq = 'atupal@qq.com'
+    pwd = 'atupal@qq.com'
     D = Dianzan(qq = qq, pwd = pwd)
+    D.dianzan(cnt = 1)

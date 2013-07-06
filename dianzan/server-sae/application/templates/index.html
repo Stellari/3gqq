@@ -16,11 +16,22 @@
 
 <body>
 <form id="login" action="/dianzan" method="post" onsubmit="remaind()">
+
+    <p>
+    <strong>妈蛋, 正在开发新功能, 在这个提示没消失前使用点赞机您可能不会看到您期望的结果 </strong>
+    <br />
+    <strong>
+        顺便求粉, 
+        <a href="https://github.com/atupal">github</a> 
+        <a href="http://weibo.com/u/2625685811"> ^_^ weibo</a>
+    </strong>
+    </p>
+
     <input name="qq" type="text" placeholder="qq">
     <br/>
     <input name="pwd" type="password" placeholder="Password">
     <br/>
-
+    
     <label>点赞页数</label>
     <select name="cnt">
         <option value="1">1</option>
@@ -53,6 +64,14 @@
     <br />
     <label>选择指定点赞好友</label><input type="checkbox" name="frr" id="frr" />
     <br />
+    <label>出现以下词语就点赞(词条间请用|分开,词条会strip空格)</label>
+    <br />
+    <input type="text" name="pos" />
+    <br />
+    <label>出现以下词语就不点赞(优先级低于上面的)</label>
+    <br />
+    <input type="text" name="neg" />
+    <br />
     <input type="submit" value="confirm" class="bt" >
 </form>
 <script>
@@ -64,6 +83,37 @@
 </script>
 <!--p>web版的点赞次数和间隔还没实现,等考试完再弄吧</p>
 <strong>很多人问我有没有记录密码,,,没有,没有记录任何东西,你可以看下源代码(右上角)</strong-->
+
+<hr />
+<form action="/feedback" method="POST">
+    <div>
+        留下你的评论吧 !
+    </div>
+    <br />
+    <label>nickname(必):</label>
+    <input type="text", name="nickname" />
+    <br />
+    <label>contact(选):</label>
+    <input type="text", name="contact" />
+    <br />
+    <label>comment(必):</label>
+    <input type="text", name="comment" />
+    <br />
+    <input type="submit" value="提交">
+</form>
+
+<hr />
+
+{%  for c in comments %}
+<div>
+    <pre>nickname: {{c[0]}}  </pre>
+    <pre>contact: {{c[1]}}  </pre>
+    <pre>comment {{c[2]}}  </pre>
+    <hr />
+</div>
+{% endfor %}
+
+
 <div class="github-fork-ribbon-wrapper right">
     <div class="github-fork-ribbon">
         <a href="https://github.com/atupal/3gqq/blob/master/dianzan/dianzan_py-dom-xpath.py">Fork me on GitHub</a>

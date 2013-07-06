@@ -147,6 +147,7 @@ class Dianzan:
             for name in names:
                 value = self._parse(None, '//*[@name="'+ name +'"]/@value', content = res.content)[0].content
                 data[name] = value
+
             from PIL import Image
             from StringIO import StringIO
             r = self.session.get(img_url)
@@ -199,6 +200,7 @@ class Dianzan:
 
         if not url:
             url = data.pop('url')
+            self.url = url  # Dianzan_verify子类没有登录, 所以手动添加url 属性
         res = self.session.post(url, data = data, headers = headers, allow_redirects = False)
         print '1' + str(res.content)
         url = res.headers['location']
@@ -370,7 +372,7 @@ class DianzanTest(unittest.TestCase):
     def tearDown(self):
         pass
 
-    def test_db(self):
+    def _test_db(self):
         db = init_db()
         add_task(db, uid = 'ts', url = 'ts')
 

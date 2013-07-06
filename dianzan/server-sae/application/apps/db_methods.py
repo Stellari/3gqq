@@ -46,9 +46,10 @@ def init_db():
     db = MySQLdb.connect(host = MYSQL_HOST, port = int(MYSQL_PORT), db = MYSQL_DB , user = MYSQL_USER, passwd = MYSQL_PASS )
     return db
 
-def create_table(db):
+def create_table(db, sql = None):
     cursor = db.cursor()
-    cursor.execute(r'''
+    if not sql:
+        sql = r'''
     create table task
         (
                 id int unsigned not null auto_increment primary key,
@@ -61,13 +62,53 @@ def create_table(db):
                 frr text(5000) default "",
                 message char(100)
         );
-            ''')
+            '''
+    cursor.execute(sql)
+    db.commit()
     del cursor
 
 def add_task(db, uid, url, ttl = 10, inc = 10, pos = "", neg = "", frr = ""):
     cursor = db.cursor()
-    cursor.execute(r'''
-        insert task (uid, ttl, url, inc, pos, neg, frr) values ("%s", %d, "%s", %d, "%s", "%s", "%s");
-            ''' % (uid, ttl, url, inc, pos, neg, frr) )
+    sql = r'''
+        select * from task where uid="%s";
+    ''' % uid
+    #sql = MySQLdb.escape_string(sql)
+    pos = MySQLdb.escape_string(pos)
+    neg = MySQLdb.escape_string(neg)
+    frr = MySQLdb.escape_string(frr)
+
+    ret = cursor.execute(sql)
+    cursor.fetchall()
+
+    if ret > 0:
+        sql = r'''
+                update task set ttl="%d", url="%s", inc="%d", pos="%s", neg="%s", frr="%s" where uid="%s";
+            ''' % (ttl, url, inc, pos, neg, frr, uid)
+    else:
+        sql = r'''
+                insert task (uid, ttl, url, inc, pos, neg, frr) values ("%s", %d, "%s", %d, "%s", "%s", "%s");
+            ''' % (uid, ttl, url, inc, pos, neg, frr)
+
+    cursor.execute(sql)
+
     db.commit()
     db.close()
+
+import unittest
+from pprint import pprint as printf
+
+class MysqlTest(unittest.TestCase):
+    def setUp(self):
+        self.db = init_db()
+
+    def tearDown(self):
+        self.db.close()
+
+    def _test_add(self):
+        cursor = self.db.cursor()
+        cursor.execute('select * from task')
+        printf( cursor.fetchall() )
+
+
+if __name__ == "__main__":
+    unittest.main()

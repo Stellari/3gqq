@@ -9,15 +9,24 @@ import sys
 reload(sys)
 sys.setdefaultencoding('utf-8')
 
-from application.apps.db_methods import init_db
 from application.apps.db_methods import add_task
+from application.apps.db_methods import init_db
 import logging
 import traceback
+
+#from application import db
 
 
 @app.route('/')
 def index():
-    return render_template('index.html')
+    db = init_db()
+    cursor = db.cursor()
+    cursor.execute('''select * from feedback''')
+    ret = cursor.fetchall()
+    try:ret_list = [ [ _[1] , _[2], _[3] ] for _ in ret ]
+    except:ret_list = [ ['error', 'error', 'error'] ]
+
+    return render_template('index.html', comments = ret_list)
 
 #import logging
 @app.route('/dianzan', methods = ['POST'])
@@ -35,10 +44,8 @@ def _dianzan():
         neg = request.form.get('neg', '')
 
         try:D = dianzan.Dianzan(qq = qq, pwd = pwd, cnt = int(cnt), feq = int(feq), inc = int(inc))
-        except Exception as e: print e
+        except Exception as e: print e; traceback.print_exc(file = sys.stdout)
 
-        if str(frr) == "on":
-            return 'coding , please wait'
 
         ret = D.dianzan(cnt = int(cnt))
 
@@ -53,12 +60,26 @@ def _dianzan():
             logging.error('/dianzan:' + str(e))
             traceback.print_exc(file=sys.stdout)
 
+        if str(frr) == "on":
+            try:ret = D.get_friend()
+            except:ret={}
+            if len(ret) == 0:
+                return '''
+                        <html>
+                        <body>
+                            </p>妈蛋, 好像获取好友列表失败了,<a href="/">再试一次</a>吧</p>
+                        </body>
+                        </html>
+
+                        '''
+            return render_template('select_friend.html', frr = ret)
+
     except Exception as e:
         #logging.error(str(e))
         print str(e)
-        ret = str(e)
-        ret += "<hr/>"
-        ret += "<p>%s</p>"%("用户名，密码错误，请再试一次")
+        traceback.print_exc(file=sys.stdout)
+        ret = "<p>%s</p>"%("用户名，密码或者验证码错误!请再试一次")
+        ret += '<script> console.log("%s") </script>' % str(e)
     return ret
 
 @app.route('/dianzan_verify', methods = ['POST'])
@@ -81,7 +102,32 @@ def _dianzan_verify():
     except Exception as e:
         #logging.error(str(e) + str(data))
         print str(e) + str(data)
-        ret = str(e)
-        ret += "<hr/>"
-        ret += "<p>%s</p>"%("用户名，密码或者验证码错误!请再试一次")
+        traceback.print_exc(file=sys.stdout)
+        ret = "<p>%s</p>"%("用户名，密码或者验证码错误!请再试一次")
+        ret += '<script> console.log("%s") </script>' % str(e)
     return ret
+
+
+@app.route('/feedback', methods = ['POST'])
+def feedback():
+    db = init_db()
+    nickname = request.form.get('nickname', '这个人很懒什么都没留下')
+    contact = request.form.get('contact', '这个人很懒什么都没留下')
+    comment = request.form.get('comment', '妈蛋, 这个人什么都没写')
+
+    import MySQLdb
+    nickname = MySQLdb.escape_string(nickname)
+    contact = MySQLdb.escape_string(contact)
+    comment = MySQLdb.escape_string(comment)
+    sql = r'''
+                insert feedback (nickname, contact, comment) values ("%s", "%s", "%s");
+        ''' % (nickname, contact, comment)
+    cursor = db.cursor()
+    cursor.execute(sql)
+    db.commit()
+    db.close()
+    return r'''
+        <html>
+            <p> 评论成功, <a href="/">点击</a>返回  </p>
+        </html>
+    '''

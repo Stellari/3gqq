@@ -30,8 +30,12 @@ import urllib
 import logging
 import unittest
 
-from db_methods import init_db
-from db_methods import add_task
+try:
+    from application.apps.db_methods import init_db
+    from application.apps.db_methods import add_task
+except:
+    from db_methods import init_db
+    from db_methods import add_task
 
 
 __metaclass__ = type
@@ -39,7 +43,7 @@ class Dianzan:
     '''
         qq         : qq帐号, 邮箱格式数字格式均可
         pwd        : 密码, 测试帐号和密码是保存在当前目录下的user文集中
-        feq        : 点赞频率
+        feq        : 点赞次数
         inc        : 点赞的时间增量(即间隔)
         cnt        : 点赞的页数
         session    : 保存了用户cookie的session对象(requests.Session)
@@ -274,6 +278,7 @@ class Dianzan:
                             friend[url[begin:end]] = tmp.text
 
                 try:all_friend_url = self.lxml_parse(url = None, content = content, _xpath = '//a[text()="%s"]' % u'下页' )[0].values()[0]
+                except IndexError:all_friend_url = []
                 except Exception as e:logging.error("next_page:" + str(e));all_friend_url=[]
 
             return friend
@@ -367,9 +372,7 @@ class DianzanTest(unittest.TestCase):
 
     def test_db(self):
         db = init_db()
-        cursor = db.cursor()
-        print cursor.execute('select * from task')
-
+        add_task(db, uid = 'ts', url = 'ts')
 
     def _test_dianzan(self):
         #qq = raw_input('qq:')

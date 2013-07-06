@@ -67,7 +67,7 @@ def create_table(db):
 def add_task(db, uid, url, ttl = 10, inc = 10, pos = "", neg = "", frr = ""):
     cursor = db.cursor()
     cursor.execute(r'''
-        insert task (uid, ttl, url, inc, pos, neg, frr) values (%d, %d, "%s", %d, "%s", "%s", "%s");
+        insert task (uid, ttl, url, inc, pos, neg, frr) values ("%s", %d, "%s", %d, "%s", "%s", "%s");
             ''' % (uid, ttl, url, inc, pos, neg, frr) )
     db.commit()
-    del cursor
+    db.close()

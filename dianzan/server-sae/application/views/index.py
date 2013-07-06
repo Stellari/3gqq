@@ -24,7 +24,15 @@ def _dianzan():
         cnt = request.form.get('cnt')
         feq = request.form.get('feq')
         inc = request.form.get('inc')
-        D = dianzan.Dianzan(qq = qq, pwd = pwd, cnt = int(cnt), feq = int(feq), inc = int(inc))
+        frr = request.form.get('frr')
+
+        try:D = dianzan.Dianzan(qq = qq, pwd = pwd, cnt = int(cnt), feq = int(feq), inc = int(inc))
+        except Exception as e: print e
+
+        if str(frr) == "on":
+            return 'coding , please wait'
+            #ret = D.getFriend()
+
         ret = D.dianzan(cnt = int(cnt))
     except Exception as e:
         #logging.error(str(e))
